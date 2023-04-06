@@ -9,7 +9,7 @@ fn fail() {
     assert_eq!(model.cases.len(), 1);
     let c = model.cases.get(0).unwrap();
     assert_eq!(c.result.state, State::FAILED);
-    assert_eq!(c.result.runtime, 283.0);
+    assert_eq!(c.result.runtime.as_secs_f32(), 0.283);
     assert_eq!(c.name, "misc");
     assert_eq!(c.diff.len(), 528);
 }

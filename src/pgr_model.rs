@@ -3,10 +3,12 @@ use patch::Patch;
 use scanf::sscanf;
 use std::{
     collections::HashMap,
-    fs, io,
+    fs::{self, File},
+    io,
     iter::Map,
     path::{Path, PathBuf},
     result,
+    time::Duration,
 };
 
 #[derive(Debug)]
@@ -18,6 +20,8 @@ pub struct TestCase {
 
 #[derive(Debug)]
 pub struct Model {
+    pub path: PathBuf,
+    pub name: String,
     pub cases: Vec<TestCase>,
 }
 
@@ -30,7 +34,7 @@ pub enum State {
 #[derive(Debug)]
 pub struct Result {
     pub state: State,
-    pub runtime: f32,
+    pub runtime: Duration,
 }
 
 impl Model {
@@ -38,7 +42,6 @@ impl Model {
         let results = read_results(read_file(path, "regression.out"));
         let diffs = read_diffs(read_file(path, "regression.diffs"));
 
-        println!("{:?}", diffs);
         let mut cases: Vec<TestCase> = Vec::new();
 
         for (name, result) in results {
@@ -49,7 +52,51 @@ impl Model {
             });
         }
 
-        return Model { cases };
+        let suite_name = String::from(path.to_str().unwrap());
+
+        return Model {
+            path: path.to_path_buf(),
+            name: suite_name,
+            cases,
+        };
+    }
+
+    pub fn save(&self) {
+        let mut out_path = self.path.clone();
+        out_path.push("regression.xml");
+        let mut file = File::create(out_path).unwrap();
+        use std::io::prelude::*;
+        file.write_all(self.to_junit().as_bytes());
+    }
+    pub fn to_junit(&self) -> String {
+        use quick_junit::*;
+
+        let mut report = Report::new("my-test-run");
+        let mut test_suite = TestSuite::new(&self.name);
+        for case in &self.cases {
+            let mut status = match case.result.state {
+                State::IGNORED => TestCaseStatus::skipped(),
+                State::PASSED => TestCaseStatus::success(),
+                State::FAILED => TestCaseStatus::non_success(NonSuccessKind::Failure),
+            };
+            status.set_description(case.diff.clone());
+
+            TestCaseStatus::success();
+            let mut out_case = TestCase::new(&case.name, status);
+            out_case.set_time(case.result.runtime);
+            out_case.set_system_out("asd");
+
+            test_suite.add_test_case(out_case);
+        }
+        // let success_case = TestCase::new("success-case", TestCaseStatus::success());
+        // let failure_case = TestCase::new(
+        //     "failure-case",
+        //     TestCaseStatus::non_success(NonSuccessKind::Failure),
+        // );
+        // test_suite.add_test_cases([success_case, failure_case]);
+        report.add_test_suite(test_suite);
+
+        return report.to_string().unwrap();
     }
 }
 fn read_file(path: &Path, file: &str) -> String {
@@ -71,13 +118,12 @@ fn read_results(results: String) -> HashMap<String, Result> {
 fn parse_result_line(line: &str) -> (String, Result) {
     let mut name: String = Default::default();
     let mut state: String = Default::default();
-    let mut time: f32 = Default::default();
+    let mut time: f64 = Default::default();
 
     let line = line.replace("failed (ignored)", "ignored");
     //test misc                         ... FAILED      283 ms
     sscanf!(line.as_str(), "test {} ... {} {} ms", name, state, time);
 
-    println!(">{:?}< ", state);
     let state = match state.as_str() {
         "FAILED" => State::FAILED,
         "ok" => State::PASSED,
@@ -88,7 +134,7 @@ fn parse_result_line(line: &str) -> (String, Result) {
     (
         name,
         Result {
-            runtime: time,
+            runtime: Duration::from_secs_f64(time / 1000.0),
             state: state,
         },
     )
@@ -117,20 +163,20 @@ mod tests {
             parse_result_line("test misc                         ... FAILED      283 ms");
         assert_eq!(name, "misc");
         assert_eq!(res.state, State::FAILED);
-        assert_eq!(res.runtime, 283.0);
+        assert_eq!(res.runtime.as_secs_f32(), 0.283);
     }
     #[test]
     fn test_parse_result_line_ok() {
         let (name, res) = parse_result_line("test  misc  ... ok      283.3 ms");
         assert_eq!(name, "misc");
         assert_eq!(res.state, State::PASSED);
-        assert_eq!(res.runtime, 283.3);
+        assert_eq!(res.runtime.as_secs_f32(), 0.2833);
     }
     #[test]
     fn test_parse_result_line_ignore() {
         let (name, res) = parse_result_line("test  misc  ... failed (ignored)      283.3 ms");
         assert_eq!(name, "misc");
         assert_eq!(res.state, State::IGNORED);
-        assert_eq!(res.runtime, 283.3);
+        assert_eq!(res.runtime.as_secs_f32(), 0.2833);
     }
 }

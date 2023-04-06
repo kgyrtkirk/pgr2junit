@@ -9,3 +9,4 @@ edition = "2021"
 quick-junit = "0.3"
 patch = "0"
 scanf = "*"
+clap = { version = "4.0", features = ["derive"] }
