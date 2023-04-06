@@ -88,12 +88,7 @@ impl Model {
 
             test_suite.add_test_case(out_case);
         }
-        // let success_case = TestCase::new("success-case", TestCaseStatus::success());
-        // let failure_case = TestCase::new(
-        //     "failure-case",
-        //     TestCaseStatus::non_success(NonSuccessKind::Failure),
-        // );
-        // test_suite.add_test_cases([success_case, failure_case]);
+        
         report.add_test_suite(test_suite);
 
         return report.to_string().unwrap();
