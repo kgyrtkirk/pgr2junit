@@ -73,16 +73,16 @@ fn parse_result_line(line: &str) -> (String, Result) {
     let mut state: String = Default::default();
     let mut time: f32 = Default::default();
 
-    let line=line.replace("failed (ignored)", "ignored");
+    let line = line.replace("failed (ignored)", "ignored");
     //test misc                         ... FAILED      283 ms
     sscanf!(line.as_str(), "test {} ... {} {} ms", name, state, time);
 
-    println!(">{:?}< ",state);
+    println!(">{:?}< ", state);
     let state = match state.as_str() {
         "FAILED" => State::FAILED,
         "ok" => State::PASSED,
         "ignored" => State::IGNORED,
-        _ => todo!("unhandled state >{:?}<?!",state),
+        _ => todo!("unhandled state >{:?}<?!", state),
     };
 
     (
