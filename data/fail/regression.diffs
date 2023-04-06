@@ -1,0 +1,16 @@
+diff -u /home/dev/timescaledb/test/expected/misc.out /home/dev/timescaledb/build/test/results/misc.out
+--- /home/dev/timescaledb/test/expected/misc.out	2023-03-13 10:15:30.099391726 +0000
++++ /home/dev/timescaledb/build/test/results/misc.out	2023-04-06 08:47:15.527074531 +0000
+@@ -2,6 +2,12 @@
+ -- Please see the included NOTICE for copyright information and
+ -- LICENSE-APACHE for a copy of the license.
+ -- This file contains tests for functionality introduced in PG12
++select 1;
++ ?column? 
++----------
++        1
++(1 row)
++
+ ------- TEST 1: Restrictive copy from file
+ CREATE TABLE "copy_golden" (
+     "time" bigint NOT NULL,
