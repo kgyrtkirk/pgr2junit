@@ -1,0 +1,32 @@
+diff -u /home/dev/timescaledb/test/expected/merge.out /home/dev/timescaledb/build/test/results/merge.out
+--- /home/dev/timescaledb/test/expected/merge.out	2023-03-13 10:15:30.099391726 +0000
++++ /home/dev/timescaledb/build/test/results/merge.out	2023-04-06 08:41:46.701606350 +0000
+@@ -1,6 +1,12 @@
+ -- This file and its contents are licensed under the Apache License 2.0.
+ -- Please see the included NOTICE for copyright information and
+ -- LICENSE-APACHE for a copy of the license.
++select 1;
++ ?column? 
++----------
++        1
++(1 row)
++
+ -- Create conditions table with location and temperature
+ CREATE TABLE conditions (
+    time        TIMESTAMPTZ       NOT NULL,
+diff -u /home/dev/timescaledb/test/expected/misc.out /home/dev/timescaledb/build/test/results/misc.out
+--- /home/dev/timescaledb/test/expected/misc.out	2023-03-13 10:15:30.099391726 +0000
++++ /home/dev/timescaledb/build/test/results/misc.out	2023-04-06 08:41:47.529609700 +0000
+@@ -2,6 +2,12 @@
+ -- Please see the included NOTICE for copyright information and
+ -- LICENSE-APACHE for a copy of the license.
+ -- This file contains tests for functionality introduced in PG12
++select 1;
++ ?column? 
++----------
++        1
++(1 row)
++
+ ------- TEST 1: Restrictive copy from file
+ CREATE TABLE "copy_golden" (
+     "time" bigint NOT NULL,

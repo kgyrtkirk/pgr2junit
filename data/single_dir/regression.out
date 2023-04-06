@@ -1,0 +1,3 @@
+test merge                        ... FAILED      304 ms
+test metadata                     ... ok          568 ms
+test misc                         ... FAILED      242 ms
