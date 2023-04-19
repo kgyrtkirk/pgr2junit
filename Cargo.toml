@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 license = "MIT"
 description = "Utility to process pg_regress output to junit xml format"
-repository = "https://github.com/kgyrtkirk/pg-dev-tools"
+repository = "https://github.com/kgyrtkirk/pgr2junit"
 
 [dependencies]
 quick-junit = "0.3"
