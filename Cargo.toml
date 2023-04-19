@@ -2,8 +2,9 @@
 name = "pgr2junit"
 version = "0.1.0"
 edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+license = "MIT"
+description = "Utility to process pg_regress output to junit xml format"
+repository = "https://github.com/kgyrtkirk/pg-dev-tools"
 
 [dependencies]
 quick-junit = "0.3"
