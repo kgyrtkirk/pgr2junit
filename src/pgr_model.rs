@@ -88,7 +88,7 @@ impl Model {
 
             test_suite.add_test_case(out_case);
         }
-        
+
         report.add_test_suite(test_suite);
 
         return report.to_string().unwrap();
@@ -104,6 +104,9 @@ fn read_results(results: String) -> HashMap<String, Result> {
     let mut res = HashMap::new();
 
     for line in results.split_terminator("\n") {
+        if line.starts_with("parallel") {
+            continue;
+        }
         let (test_name, result) = parse_result_line(line);
         res.insert(test_name, result);
     }
@@ -115,9 +118,8 @@ fn parse_result_line(line: &str) -> (String, Result) {
     let mut state: String = Default::default();
     let mut time: f64 = Default::default();
 
-    let line = line.replace("failed (ignored)", "ignored");
-    //test misc                         ... FAILED      283 ms
-    sscanf!(line.as_str(), "test {} ... {} {} ms", name, state, time);
+    let line = &line.replace("failed (ignored)", "ignored")[5..];
+    sscanf!(line, "{} ... {} {} ms", name, state, time);
 
     let state = match state.as_str() {
         "FAILED" => State::FAILED,
@@ -136,8 +138,11 @@ fn parse_result_line(line: &str) -> (String, Result) {
 }
 
 fn read_diffs(diffs: String) -> HashMap<String, String> {
-    let patches = Patch::from_multiple(&diffs).unwrap();
     let mut res = HashMap::new();
+    if diffs.is_empty(){
+        return res;
+    }
+    let patches = Patch::from_multiple(&diffs).unwrap();
     for patch in patches {
         let path = patch.old.path.to_string();
         let name = Path::new(&path).with_extension("");

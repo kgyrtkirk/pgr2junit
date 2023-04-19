@@ -19,3 +19,8 @@ fn mixed() {
     let model = Model::new(Path::new("data/mixed"));
     assert_eq!(model.cases.len(), 3);
 }
+
+#[test]
+fn parallel() {
+    let model = Model::new(Path::new("data/parallel"));
+}
